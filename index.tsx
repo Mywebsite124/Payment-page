@@ -7,9 +7,8 @@ import {
   CreditCard, 
   ShieldCheck, 
   CheckCircle2, 
-  Info,
-  ArrowLeft,
-  AlertCircle
+  ArrowLeft, 
+  AlertCircle 
 } from 'lucide-react';
 
 // --- Supabase Configuration ---
@@ -39,11 +38,10 @@ const CardVisualizer = ({
   };
 
   const getBrandIcon = () => {
-    switch (brand.toLowerCase()) {
-      case 'visa': return 'https://upload.wikimedia.org/wikipedia/commons/d/d6/Visa_2021.svg';
-      case 'mastercard': return 'https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg';
-      default: return null;
-    }
+    const b = brand ? brand.toLowerCase() : '';
+    if (b === 'visa') return 'https://upload.wikimedia.org/wikipedia/commons/d/d6/Visa_2021.svg';
+    if (b === 'mastercard') return 'https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg';
+    return null;
   };
 
   const brandIcon = getBrandIcon();
@@ -132,7 +130,8 @@ const PaymentForm = () => {
     else if (value.startsWith('5')) setBrand('mastercard');
     else setBrand('');
 
-    const formatted = value.match(/.{1,4}/g)?.join(' ') || '';
+    const parts = value.match(/.{1,4}/g);
+    const formatted = parts ? parts.join(' ') : '';
     setFormData({ ...formData, number: formatted });
   };
 
@@ -178,7 +177,7 @@ const PaymentForm = () => {
       setIsSuccess(true);
     } catch (err) {
       console.error('Submission error:', err);
-      setError(err.message || 'Error processing request. Check your Supabase table schema.');
+      setError(err.message || 'Submission failed. Please check your database settings.');
     } finally {
       setIsProcessing(false);
     }
@@ -202,7 +201,7 @@ const PaymentForm = () => {
         </p>
         <button 
           onClick={() => window.location.reload()}
-          className="w-full bg-slate-900 text-white py-4 rounded-xl font-semibold shadow-lg"
+          className="w-full bg-slate-900 text-white py-4 rounded-xl font-semibold shadow-lg hover:bg-slate-800 transition-colors"
         >
           Return
         </button>
@@ -353,8 +352,13 @@ const App = () => {
   );
 };
 
+// Main entry point
 const container = document.getElementById('root');
 if (container) {
-  const root = createRoot(container);
-  root.render(<App />);
+  try {
+    const root = createRoot(container);
+    root.render(<App />);
+  } catch (err) {
+    console.error('Failed to render app:', err);
+  }
 }
